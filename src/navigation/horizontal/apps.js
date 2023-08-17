@@ -18,22 +18,7 @@ export default [
         to: "apps-calendar",
         icon: { icon: "mdi-calendar-blank" },
       },
-      {
-        title: "Invoice",
-        icon: { icon: "mdi-file-document-outline" },
-        children: [
-          { title: "List", to: "apps-invoice-list" },
-          {
-            title: "Preview",
-            to: { name: "apps-invoice-preview-id", params: { id: "5036" } },
-          },
-          {
-            title: "Edit",
-            to: { name: "apps-invoice-edit-id", params: { id: "5036" } },
-          },
-          { title: "Add", to: "apps-invoice-add" },
-        ],
-      },
+      
       {
         title: "Order",
         icon: { icon: "mdi-history" },
@@ -41,25 +26,25 @@ export default [
           { title: "List", to: "apps-order-list" },
           {
             title: "View",
-            to: { name: "apps-order-view-id", params: { id: "5036" } },
+            to: { name: "apps-order-view-id", params: { id: JSON.parse(localStorage.getItem("userData")).id } },
           },
           
         ],
       },
-      {
-        title: "Owner",
-        icon: { icon: "mdi-account-outline" },
-        children: [
-          { title: "List", to: "apps-user-list" },
-          {
-            title: "View",
-            to: {
-              name: "apps-user-view-id",
-              params: { id: JSON.parse(localStorage.getItem("userData")).id },
-            },
-          },
-        ],
-      },
+      // {
+      //   title: "Owner",
+      //   icon: { icon: "mdi-account-outline" },
+      //   children: [
+      //     { title: "List", to: "apps-user-list" },
+      //     {
+      //       title: "View",
+      //       to: {
+      //         name: "apps-user-view-id",
+      //         params: { id: JSON.parse(localStorage.getItem("userData")).id },
+      //       },
+      //     },
+      //   ],
+      // },
       {
         title: "Restaurant",
         icon: { icon: "mdi-silverware-fork-knife" },
@@ -75,14 +60,14 @@ export default [
         ],
       },
       {
-        title: "Claiming",
-        icon: { icon: "mdi-check-all" },
+        title: "Item",
+        icon: { icon: "mdi-noodles" },
         children: [
-          { title: "List", to: "apps-claim-list" },
+          { title: "List", to: "apps-item-list" },
           {
             title: "View",
             to: {
-              name: "apps-claim-view-id",
+              name: "apps-item-view-id",
               params: { id: JSON.parse(localStorage.getItem("userData")).id },
             },
           },

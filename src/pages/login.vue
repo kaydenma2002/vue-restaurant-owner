@@ -1,19 +1,21 @@
 <script setup>
-import { VForm } from "vuetify/components/VForm";
 import { useAppAbility } from "@/plugins/casl/useAppAbility";
 import AuthProvider from "@/views/pages/authentication/AuthProvider.vue";
-import axios from "@axios";
 import { useGenerateImageVariant } from "@core/composable/useGenerateImageVariant";
-import tree from "@images/pages/tree.png";
-import { VNodeRenderer } from "@layouts/components/VNodeRenderer";
-import { themeConfig } from "@themeConfig";
-import { emailValidator, requiredValidator } from "@validators";
 import authV2LoginIllustrationBorderedDark from "@images/pages/auth-v2-login-illustration-bordered-dark.png";
 import authV2LoginIllustrationBorderedLight from "@images/pages/auth-v2-login-illustration-bordered-light.png";
 import authV2LoginIllustrationDark from "@images/pages/auth-v2-login-illustration-dark.png";
 import authV2LoginIllustrationLight from "@images/pages/auth-v2-login-illustration-light.png";
 import authV2MaskDark from "@images/pages/auth-v2-mask-dark.png";
 import authV2MaskLight from "@images/pages/auth-v2-mask-light.png";
+import tree from "@images/pages/tree.png";
+import { VNodeRenderer } from "@layouts/components/VNodeRenderer";
+import { themeConfig } from "@themeConfig";
+import { emailValidator, requiredValidator } from "@validators";
+import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+import { VForm } from "vuetify/components/VForm";
 
 const isPasswordVisible = ref(false);
 const authThemeImg = useGenerateImageVariant(
@@ -40,31 +42,34 @@ const rememberMe = ref(false);
 
 const login = () => {
   axios
-    .post("/admin/login", {
+    .post("https://142.11.239.33:8000/api/login", {
       email: email.value,
       password: password.value,
     })
     .then((res) => {
-      console.log(res);
-      localStorage.setItem(
-        "userAbilities",
-        JSON.stringify([
-          {
-            action: "manage",
-            subject: "all",
-          },
-        ])
-      );
-      
-      ability.update(localStorage.getItem("userAbilities"));
-      localStorage.setItem("userData", JSON.stringify(res.data.user));
-      localStorage.setItem("accessToken", JSON.stringify(res.data.token));
+      if (res.data.data.user.user_type === "1") {
+        localStorage.setItem(
+          "userAbilities",
+          JSON.stringify([
+            {
+              action: "manage",
+              subject: "all",
+            },
+          ])
+        );
 
-      // Redirect to `to` query if exist or redirect to index route
-      router.replace(route.query.to ? String(route.query.to) : "/");
+        ability.update(localStorage.getItem("userAbilities"));
+        localStorage.setItem("userData", JSON.stringify(res.data.user));
+        localStorage.setItem("adminToken", JSON.stringify(res.data.token));
+        toast.success(`Welcome back, ${res.data.user.name}`);
+        // Redirect to `to` query if exist or redirect to index route
+        router.replace(route.query.to ? String(route.query.to) : "/");
+      } else {
+        toast.error("email or password not match");
+      }
     })
     .catch((e) => {
-      console.log(e);
+      toast.error("email or password not match");
     });
 };
 
@@ -110,7 +115,7 @@ const onSubmit = () => {
               Please sign-in to your account and start the adventure
             </p>
           </VCardText>
-          
+
           <VCardText>
             <VForm ref="refVForm" @submit.prevent="onSubmit">
               <VRow>
@@ -119,6 +124,7 @@ const onSubmit = () => {
                   <VTextField
                     v-model="email"
                     label="Email"
+                    name="email"
                     type="email"
                     :rules="[requiredValidator, emailValidator]"
                     :error-messages="errors.email"
@@ -129,6 +135,7 @@ const onSubmit = () => {
                 <VCol cols="12">
                   <VTextField
                     v-model="password"
+                    name="password"
                     label="Password"
                     :rules="[requiredValidator]"
                     :type="isPasswordVisible ? 'text' : 'password'"

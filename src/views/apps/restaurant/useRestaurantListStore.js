@@ -10,7 +10,7 @@ export const useRestaurantListStore = defineStore("RestaurantListStore", {
         
         const sort = JSON.parse(JSON.stringify(params.options.sortBy)) ?? null;
         
-        const response = await axios.get(`/admin/restaurants?search=${params.q.toLowerCase()}&page=${params.options.page}&key=${sort[0]?.key ?? null}&order=${sort[0]?.order ?? null}&paginate=${params.options.itemsPerPage}&status=${params.status}`);
+        const response = await axios.get(`/owner/restaurants?search=${params.q.toLowerCase()}&page=${params.options.page}&key=${sort[0]?.key ?? null}&order=${sort[0]?.order ?? null}&paginate=${params.options.itemsPerPage}&status=${params.status}`);
 
         return response
        

@@ -1,17 +1,17 @@
 <script setup>
 import { paginationMeta } from "@/@fake-db/utils";
-import { useClaimListStore } from "@/views/apps/claim/useClaimListStore";
+import { useItemListStore } from "@/views/apps/item/useItemListStore";
 import { debounce } from "lodash";
 import { VDataTableServer } from "vuetify/labs/VDataTable";
 
-const claimListStore = useClaimListStore();
+const itemListStore = useItemListStore();
 const searchQuery = ref("");
 const selectedRole = ref("");
 const selectedPlan = ref("");
 const selectedStatus = ref("null");
 const totalPage = ref(1);
-const totalClaims = ref(0);
-const claims = ref([]);
+const totalItems = ref(0);
+const items = ref([]);
 
 const options = ref({
   page: 1,
@@ -24,17 +24,36 @@ const options = ref({
 // Headers
 const headers = [
   {
-    title: "APPLICANT",
-    key: "owner_name",
+    title:"ITEM",
+    key: "title",
   },
   {
-    title: "EMAIL",
-    key: "email",
+    title:"CATEGORY",
+    key: "category",
+  },
+  {
+    title:"PRICE",
+    key: "price",
   },
   {
     title: "RESTAURANT",
     key: "restaurant_name",
   },
+  {
+    title: "CITY",
+    key: "city",
+  },
+  
+  {
+    title: "STATE",
+    key: "state",
+  },
+  {
+    title: "ZIP CODE",
+    key: "zip_code",
+  },
+  
+  
 
   {
     title: "STATUS",
@@ -47,10 +66,10 @@ const headers = [
   },
 ];
 
-// 👉 Fetching claims
-const fetchClaims = debounce(() => {
-  claimListStore
-    .fetchClaims({
+// 👉 Fetching items
+const fetchItems = debounce(() => {
+  itemListStore
+    .fetchItems({
       q: searchQuery.value,
       status: selectedStatus.value,
 
@@ -58,38 +77,38 @@ const fetchClaims = debounce(() => {
     })
     .then((response) => {
       console.log(response);
-      claims.value = response.data.data;
+      items.value = response.data.data;
       totalPage.value = response.data.total;
-      totalClaims.value = response.data.total;
+      totalItems.value = response.data.total;
       options.value.page = response.data.current_page;
     })
     .catch((error) => {
       console.error(error);
     });
 }, 100);
-fetchClaims();
+fetchItems();
 
 watch(
   () => options.value.itemsPerPage,
   (count) => {
-    fetchClaims();
+    fetchItems();
   }
 );
 
 watch(
   () => options.value.page,
   (count) => {
-    fetchClaims();
+    fetchItems();
   }
 );
 watch(
   () => options.value.sortBy,
   (count) => {
-    fetchClaims();
+    fetchItems();
   }
 );
 watch([searchQuery, selectedStatus], () => {
-  fetchClaims();
+  fetchItems();
 });
 // 👉 search filters
 const roles = [
@@ -203,26 +222,25 @@ const resolveUserStatusText = (stat) => {
   return "";
 };
 
-
-const addNewUser = (claimData) => {
-  claimListStore.addUser(claimData);
+const addNewUser = (itemData) => {
+  itemListStore.addUser(itemData);
 
   // refetch User
-  fetchClaims();
+  fetchItems();
 };
 const approveClaim = (id) => {
-  claimListStore.approveClaim(id).then(res =>{
-    console.log(res)
-  })
+  itemListStore.approveClaim(id).then((res) => {
+    console.log(res);
+  });
 
   // refetch User
-  fetchClaims();
+  fetchItems();
 };
 const deleteUser = (id) => {
-  claimListStore.deleteUser(id);
+  itemListStore.deleteUser(id);
 
   // refetch User
-  fetchClaims();
+  fetchItems();
 };
 </script>
 
@@ -280,7 +298,7 @@ const deleteUser = (id) => {
 
         <VSpacer />
 
-        <div class="app-claim-search-filter d-flex align-center gap-6">
+        <div class="app-item-search-filter d-flex align-center gap-6">
           <!-- 👉 Search  -->
           <VTextField
             v-model="searchQuery"
@@ -296,66 +314,48 @@ const deleteUser = (id) => {
       <VDataTableServer
         v-model:items-per-page="options.itemsPerPage"
         v-model:page="options.page"
-        :items="claims"
-        :items-length="totalClaims"
+        :items="items"
+        :items-length="totalItems"
         :headers="headers"
         show-select
         class="rounded-0"
         @update:options="options = $event"
       >
         <!-- User -->
-        <template #item.owner_name="{ item }">
-          <div class="d-flex">
-            <!-- <VAvatar
-              size="34"
-              :variant="!item.raw.avatar ? 'tonal' : undefined"
-              :color="!item.raw.avatar ? resolveUserRoleVariant(item.raw.role).color : undefined"
-              class="me-3"
-            >
-              <VImg
-                v-if="item.raw.avatar"
-                :src="item.raw.avatar"
-              />
-              <span v-else>{{ avatarText(item.raw.name) }}</span>
-            </VAvatar> -->
-
-            <div class="d-flex flex-column">
-              <h6 class="text-sm">
-                <!-- <RouterLink
-                  :to="{
-                    name: 'apps-claim-view-id',
-                    params: { id: item.raw.id },
-                  }"
-                  class="font-weight-medium claim-list-name"
-                >
-                  
-                </RouterLink> -->
-                {{ item.raw.user.email }}
-              </h6>
-
-              
-            </div>
-          </div>
-        </template>
-
-        <!-- Email -->
-        <template #item.email="{ item }">
-          <span class="text-sm">
-            {{ item.raw.user.email }}
-          </span>
-        </template>
         <template #item.restaurant_name="{ item }">
           <span class="text-sm">
-            {{ item.raw.restaurant?.name }}
+            {{ item.raw?.restaurant.name }}
+          </span>
+        </template>
+
+        <!-- city -->
+        <template #item.city="{ item }">
+          <span class="text-sm">
+            {{ item.raw?.restaurant.city }}
+          </span>
+        </template>
+        <template #item.phone="{ item }">
+          <span class="text-sm">
+            {{ item.raw?.restaurant.phone }}
+          </span>
+        </template>
+        <template #item.state="{ item }">
+          <span class="text-sm">
+            {{ item.raw?.restaurant.state }}
+          </span>
+        </template>
+        <template #item.zip_code="{ item }">
+          <span class="text-sm">
+            {{ item.raw?.restaurant.zip_code }}
           </span>
         </template>
         <template #item.status="{ item }">
           <VChip
-            :color="resolveUserStatusVariant(item.raw.status)"
+            :color="resolveUserStatusVariant(item.raw?.status)"
             density="comfortable"
             class="text-capitalize"
           >
-            {{ resolveUserStatusText(item.raw.status) }}
+            {{ resolveUserStatusText(item.raw?.status) }}
           </VChip>
         </template>
 
@@ -368,21 +368,14 @@ const deleteUser = (id) => {
               <VList>
                 <VListItem
                   :to="{
-                    name: 'apps-claim-view-id',
-                    params: { id: item.raw.id },
+                    name: 'apps-item-view-id',
+                    params: { id: item.raw?.id },
                   }"
                 >
                   <template #prepend>
                     <VIcon icon="mdi-eye-outline" />
                   </template>
                   <VListItemTitle>View</VListItemTitle>
-                </VListItem>
-
-                <VListItem link @click="approveClaim(item.raw.id)">
-                  <template #prepend>
-                    <VIcon color="success" icon="mdi-check-decagram" />
-                  </template>
-                  <VListItemTitle>Approve</VListItemTitle>
                 </VListItem>
 
                 
@@ -408,7 +401,7 @@ const deleteUser = (id) => {
             </div>
 
             <span class="d-flex align-center text-sm me-2 text-high-emphasis">{{
-              paginationMeta(options, totalClaims)
+              paginationMeta(options, totalItems)
             }}</span>
 
             <div class="d-flex gap-x-2 align-center me-2">
@@ -429,12 +422,12 @@ const deleteUser = (id) => {
                 variant="text"
                 color="default"
                 :disabled="
-                  options.page >= Math.ceil(totalClaims / options.itemsPerPage)
+                  options.page >= Math.ceil(totalItems / options.itemsPerPage)
                 "
                 @click="
-                  options.page >= Math.ceil(totalClaims / options.itemsPerPage)
+                  options.page >= Math.ceil(totalItems / options.itemsPerPage)
                     ? (options.page = Math.ceil(
-                        totalClaims / options.itemsPerPage
+                        totalItems / options.itemsPerPage
                       ))
                     : options.page++
                 "
@@ -447,12 +440,11 @@ const deleteUser = (id) => {
     </VCard>
 
     <!-- 👉 Add New User -->
-    
   </section>
 </template>
 
 <style lang="scss">
-.app-claim-search-filter {
+.app-item-search-filter {
   inline-size: 24.0625rem;
 }
 
@@ -460,7 +452,7 @@ const deleteUser = (id) => {
   text-transform: capitalize;
 }
 
-.claim-list-name:not(:hover) {
+.item-list-name:not(:hover) {
   color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
 }
 </style>

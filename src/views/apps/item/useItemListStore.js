@@ -1,15 +1,15 @@
 import axios from "@axios";
 import { defineStore } from "pinia";
 
-export const useClaimListStore = defineStore("ClaimListStore", {
+export const useItemListStore = defineStore("ItemListStore", {
   actions: {
     // 👉 Fetch restaurants data
-    async fetchClaims(params) {
+    async fetchItems(params) {
       try {
         
         const sort = JSON.parse(JSON.stringify(params.options.sortBy)) ?? null;
         
-        const response = await axios.get(`/admin/claims?search=${params.q.toLowerCase()}&page=${params.options.page}&key=${sort[0]?.key ?? null}&order=${sort[0]?.order ?? null}&paginate=${params.options.itemsPerPage}&status=${params.status}`);
+        const response = await axios.get(`/owner/items?search=${params.q.toLowerCase()}&page=${params.options.page}&key=${sort[0]?.key ?? null}&order=${sort[0]?.order ?? null}&paginate=${params.options.itemsPerPage}&status=${params.status}`);
 
         return response
        
@@ -17,7 +17,7 @@ export const useClaimListStore = defineStore("ClaimListStore", {
         // const queryLower = params.q.toLowerCase();
 
         // // filter restaurants
-        // let filteredClaims = response.data
+        // let filteredItems = response.data
         //   .filter(
         //     (restaurant) =>
         //       (restaurant.name.toLowerCase().includes(queryLower) ||
@@ -28,31 +28,31 @@ export const useClaimListStore = defineStore("ClaimListStore", {
         // const sort = JSON.parse(JSON.stringify(sortBy));
         // if (sort.length) {
         //   if (sort[0]?.key === "restaurant") {
-        //     filteredClaims = filteredClaims.sort((a, b) => {
+        //     filteredItems = filteredItems.sort((a, b) => {
         //       if (sort[0]?.order === "asc") return a.name.localeCompare(b.name);
         //       else return b.name.localeCompare(a.name);
         //     });
         //   }
         //   if (sort[0]?.key === "email") {
-        //     filteredClaims = filteredClaims.sort((a, b) => {
+        //     filteredItems = filteredItems.sort((a, b) => {
         //       if (sort[0]?.order === "asc")
         //         return a.email.localeCompare(b.email);
         //       else return b.email.localeCompare(a.email);
         //     });
         //   }
         // }
-        // const totalClaims = filteredClaims.length;
+        // const totalItems = filteredItems.length;
 
         // // total pages
-        // const totalPages = Math.ceil(totalClaims / itemsPerPage);
+        // const totalPages = Math.ceil(totalItems / itemsPerPage);
 
         // return [
         //   200,
         //   {
-        //     restaurants: paginateArray(filteredClaims, itemsPerPage, page),
+        //     restaurants: paginateArray(filteredItems, itemsPerPage, page),
         //     totalPages,
-        //     totalClaims,
-        //     page: page > Math.ceil(totalClaims / itemsPerPage) ? 1 : page,
+        //     totalItems,
+        //     page: page > Math.ceil(totalItems / itemsPerPage) ? 1 : page,
         //   },
         // ];
       } catch (error) {
@@ -73,18 +73,18 @@ export const useClaimListStore = defineStore("ClaimListStore", {
     },
 
     // 👉 fetch single restaurant
-    async fetchClaim(id) {
+    async fetchItem(id) {
       try {
-        const response = await axios.get("/admin/viewClaimById", {params: {id: id} });
+        const response = await axios.get("/owner/viewItemById", {params: {id: id} });
         return response;
       } catch (error) {
         console.log(error);
       }
     },
 
-    async approveClaim(id){
+    async approveItem(id){
       try {
-        const response = await axios.post("/admin/approveClaimById",{id: id})
+        const response = await axios.post("/admin/approveItemById",{id: id})
         return response
       } catch(error){
         console.log(error)

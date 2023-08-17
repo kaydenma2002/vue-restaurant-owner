@@ -1,6 +1,5 @@
-import { defineStore } from "pinia";
 import axios from "@axios";
-import { genId, paginateArray } from "@/@fake-db/utils";
+import { defineStore } from "pinia";
 
 export const useOrderListStore = defineStore("OrderListStore", {
   actions: {
@@ -10,7 +9,7 @@ export const useOrderListStore = defineStore("OrderListStore", {
         
         const sort = JSON.parse(JSON.stringify(params.options.sortBy)) ?? null;
         
-        const response = await axios.get(`/admin/orders?search=${params.q.toLowerCase()}&page=${params.options.page}&key=${sort[0]?.key ?? null}&order=${sort[0]?.order ?? null}&paginate=${params.options.itemsPerPage}&status=${params.status}`);
+        const response = await axios.get(`/owner/orders?search=${params.q.toLowerCase()}&page=${params.options.page}&key=${sort[0]?.key ?? null}&order=${sort[0]?.order ?? null}&paginate=${params.options.itemsPerPage}&status=${params.status}`);
 
         return response
        
@@ -18,16 +17,39 @@ export const useOrderListStore = defineStore("OrderListStore", {
         console.log(error);
       }
     },
-    async fetchOrdersByRestaurantId(restaurant_id){
+    async fetchOrdersByRestaurantId(restaurant_id,options){
       try {
-        
-        
-        const response = await axios.get(`/admin/viewOrdersByRestaurantId`,{params: {restaurant_id : restaurant_id}});
-
+        const response = await axios.get(`/admin/viewOrdersByRestaurantId?page=${options.page}&paginate=${options.itemsPerPage}&restaurant_id=${restaurant_id}`);
         return response
-       
       } catch (error) {
         console.log(error);
+      }
+    },
+    async fetchItemsByOrderId(order_id){
+      try {
+        const response = await axios.get(`/owner/viewItemsByOrderId`,{params: {order_id : order_id}});
+        return response
+      } catch(error){
+        console.log(error)
+      }
+    },
+    async fetchSales(timeRange){
+      try {
+        console.log(timeRange)
+        const response = await axios.post(`/owner/sales`, {
+          time_range: timeRange
+        })
+        return response
+      }catch(error){
+        console.log(error)
+      }
+    },
+    async fetchTopRestaurantSalesByWeek(){
+      try {
+        const response = await axios.get(`/admin/topRestaurantSalesByWeek`)
+        return response
+      }catch(error){
+        console.log(error)
       }
     },
 
