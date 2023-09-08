@@ -1,7 +1,7 @@
-import { fileURLToPath } from 'node:url'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
+import { fileURLToPath } from 'node:url'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
@@ -21,7 +21,7 @@ const sslCertificate = {
 export default ({ command }) => {
   let host = '127.0.0.1'
   if (command === 'build') {
-    host = 'ehl.ai'
+    host = '142.11.239.30'
   }
 
 return defineConfig({

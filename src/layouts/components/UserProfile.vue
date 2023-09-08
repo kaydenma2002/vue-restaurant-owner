@@ -1,13 +1,16 @@
 <script setup>
-import { PerfectScrollbar } from "vue3-perfect-scrollbar";
 import { initialAbility } from "@/plugins/casl/ability";
 import { useAppAbility } from "@/plugins/casl/useAppAbility";
+import { PerfectScrollbar } from "vue3-perfect-scrollbar";
+import echo from "../../plugins/echo";
 
 const router = useRouter();
 const ability = useAppAbility();
 const userData = JSON.parse(localStorage.getItem("userData") || "null");
 
 const logout = () => {
+  console.log(echo);
+  echo.leaveAllChannels();
   // Remove "userData" from localStorage
   localStorage.removeItem("userData");
 
@@ -35,8 +38,7 @@ const userProfileList = [
     title: "Profile",
     to: {
       name: "apps-user-view-id",
-      params: {id: JSON.parse(localStorage.getItem("userData")).id
-},
+      params: { id: JSON.parse(localStorage.getItem("userData")).id },
     },
   },
   {

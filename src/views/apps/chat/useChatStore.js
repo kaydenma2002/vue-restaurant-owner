@@ -45,6 +45,15 @@ export const useChatStore = defineStore("chat", {
       console.log(data)
       this.activeChat = data;
     },
+    async ListenForChat(userId){
+      const data = await axios.get(`/owner/chats?super_admin_id=${userId}`);
+      if(userId === this.activeChat.data.super_admin.id){
+        this.activeChat = data;
+      }else{
+
+      }
+      
+    },
     async sendMsg(message) {
       const senderId = this.profileUser?.id
       console.log(this.activeChat)

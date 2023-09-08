@@ -4,11 +4,9 @@ import { useThemeConfig } from "@core/composable/useThemeConfig";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 // @layouts plugin
-import Create from "@/toastify/order/create.vue";
 import { AppContentLayoutNav } from "@layouts/enums";
-import Echo from "laravel-echo";
-import Pusher from "pusher-js";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
+import echo from "../plugins/echo";
 
 const DefaultLayoutWithHorizontalNav = defineAsyncComponent(() =>
   import("./components/DefaultLayoutWithHorizontalNav.vue")
@@ -27,49 +25,25 @@ const { layoutAttrs, injectSkinClasses } = useSkins();
 const router = useRouter();
 
 injectSkinClasses();
-const pusher = new Pusher("68572aaa73079990a7d7", {
-  cluster: "mt1",
-  encrypted: true,
-});
-
-const echo = new Echo({
-  broadcaster: "pusher",
-  key: "68572aaa73079990a7d7",
-  cluster: "mt1",
-  encrypted: true,
-  pusher: pusher,
-  
-});
-
 
 echo.channel("order-create").listen("OrderCreated", (data) => {
-  console.log(data);
-  toast.success(
-    `New Order was placed successfully by ${data.order.user.name} at ${data.order.restaurant.name}`,
-    {
-      onClick: () =>
-        router.push({
-          name: "apps-order-view-id",
-          params: { id: data.order.id },
-        }),
-      dangerouslyHTMLString: true, // can override the global option
-    }
-  );
+  if (
+    data.order.restaurant.user_id ===
+    JSON.parse(localStorage.getItem("userData")).id
+  ) {
+    toast.success(
+      `New Order was placed successfully by ${data.order.user.name} at ${data.order.restaurant.name}`,
+      {
+        onClick: () =>
+          router.push({
+            name: "apps-order-view-id",
+            params: { id: data.order.id },
+          }),
+        dangerouslyHTMLString: true, // can override the global option
+      }
+    );
+  }
 });
-echo.channel("claim-create").listen("ClaimCreated", (data) => {
-  toast.success(
-    `Restaurant ${data.claim.restaurant.name} has been received a claim request from ${data.claim.email}`,
-    {
-      onClick: () =>
-        router.push({
-          name: "apps-item-view-id",
-          params: { id: data.claim.id },
-        }),
-      dangerouslyHTMLString: true, // can override the global option
-    }
-  );
-});
-console.log(echo)
 </script>
 
 <template>

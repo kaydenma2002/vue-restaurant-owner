@@ -8,6 +8,7 @@ import CrmTransactions from "@/views/dashboards/crm/CrmTransactions.vue";
 import CrmUpgradeYourPlan from "@/views/dashboards/crm/CrmUpgradeYourPlan.vue";
 import illustration1 from "@images/cards/illustration-1.png";
 import illustration2 from "@images/cards/illustration-2.png";
+console.log(localStorage.getItem("accessToken"));
 const orderListStore = useOrderListStore();
 const totalSales = ref(0);
 const fetchSales = () => {

@@ -1,36 +1,20 @@
 <script setup>
-import avatar3 from "@images/avatars/avatar-3.png";
-import avatar4 from "@images/avatars/avatar-4.png";
-import avatar5 from "@images/avatars/avatar-5.png";
-import paypal from "@images/svg/paypal.svg";
-import Echo from "laravel-echo";
-import Pusher from "pusher-js";
-import { useOrderListStore } from "@/views/apps/order/useOrderListStore";
+import echo from "../../plugins/echo";
+
 import { useNotificationListStore } from "@/views/apps/notification/useNotificationListStore";
-import { useRoute, useRouter } from "vue-router";
+import { useOrderListStore } from "@/views/apps/order/useOrderListStore";
+import { useRouter } from "vue-router";
 
 const orderListStore = useOrderListStore();
 const notificationListStore = useNotificationListStore();
 const router = useRouter();
-
-const pusher = new Pusher("68572aaa73079990a7d7", {
-  cluster: "mt1",
-  encrypted: true,
-});
-const echo = new Echo({
-  broadcaster: "pusher",
-  key: "68572aaa73079990a7d7",
-  cluster: "mt1",
-  encrypted: true,
-  pusher: pusher,
-});
 
 const notifications = ref([]);
 notificationListStore
   .fetchNotifications()
   .then((items) => {
     items?.data?.map((notification) => {
-      console.log(JSON.parse(localStorage.getItem("userData")));
+      //console.log(JSON.parse(localStorage.getItem("userData")));
       if (notification.type == 0) {
         orderListStore
           .fetchItemsByOrderId(notification.data)
@@ -43,9 +27,9 @@ notificationListStore
               isSeen: notification.admin_read_at === null ? false : true,
               type: notification?.type,
               data: notification?.data,
-              add_data: notification?.add_data
+              add_data: notification?.add_data,
             });
-            console.log(notifications.value);
+            //console.log(notifications.value);
           })
           .catch((error) => {
             console.log(error);
@@ -119,8 +103,8 @@ echo.channel("notification-create").listen("NotificationCreated", (data) => {
         time: `${formatDate(res.data?.created_at)}`,
         isSeen: false,
         type: `${res.data?.type}`,
-        data:res.data?.id,
-        add_data:res.data?.add_data
+        data: res.data?.id,
+        add_data: res.data?.add_data,
       });
     });
   } else if (data.notification.type == 2) {

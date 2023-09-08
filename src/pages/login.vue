@@ -39,15 +39,16 @@ const refVForm = ref();
 const email = ref("");
 const password = ref("");
 const rememberMe = ref(false);
+const isProduction = process.env.NODE_ENV === "production";
 
 const login = () => {
   axios
-    .post("https://142.11.239.33:8000/api/login", {
+  .post(isProduction ? "https://142.11.205.17/api/login" :"https://127.0.0.1/api/login", {
       email: email.value,
       password: password.value,
     })
     .then((res) => {
-      if (res.data.data.user.user_type === "1") {
+      if (res.data.user.user_type === "1") {
         localStorage.setItem(
           "userAbilities",
           JSON.stringify([
@@ -60,8 +61,10 @@ const login = () => {
 
         ability.update(localStorage.getItem("userAbilities"));
         localStorage.setItem("userData", JSON.stringify(res.data.user));
-        localStorage.setItem("adminToken", JSON.stringify(res.data.token));
+
+        localStorage.setItem("accessToken", JSON.stringify(res.data.token));
         toast.success(`Welcome back, ${res.data.user.name}`);
+
         // Redirect to `to` query if exist or redirect to index route
         router.replace(route.query.to ? String(route.query.to) : "/");
       } else {
@@ -69,6 +72,7 @@ const login = () => {
       }
     })
     .catch((e) => {
+      console.log(e);
       toast.error("email or password not match");
     });
 };
